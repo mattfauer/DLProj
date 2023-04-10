@@ -1,3 +1,7 @@
+#Backbone code from https://github.com/kuangliu/pytorch-cifar
+#Python file generated from ipynb as there were a number of issues training the model using jupyter locally 
+#Run locally w/ i9 13900k cpu and rtx 4090 gpu 
+
 #!/usr/bin/env python
 # coding: utf-8
 
@@ -16,6 +20,8 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Hyper-parameters
 num_epochs = 40
+#lowered num_epochs to speed up training and allow multiple passes to tune hyper parameters
+#lowered learning rate to prevent convergence to suboptimal solution
 learning_rate = 0.0001
 
 # Image preprocessing modules
