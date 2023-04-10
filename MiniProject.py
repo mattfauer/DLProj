@@ -52,7 +52,7 @@ test_dataset = torchvision.datasets.CIFAR10(root='~/.local/share/jupyter/runtime
 
 # In[2]:
 
-
+#dramatically lowered batch size to increase test accuracy at the cost of performance
 train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
                                            batch_size=32,
                                            shuffle=True)
@@ -100,7 +100,7 @@ class ResNet(nn.Module):
     def __init__(self, block, num_blocks, num_classes=10):
         super(ResNet, self).__init__()
         self.in_planes = 64
-
+        #tuned layers to get as close to 5M parameters as possible without going over
         self.conv1 = nn.Conv2d(3, 64, kernel_size=3,
                                stride=1, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(64)
@@ -109,6 +109,7 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 256, num_blocks[2], stride=2)
         self.layer4 = self._make_layer(block, 256, num_blocks[3], stride=2)
         self.linear = nn.Linear(256*block.expansion, num_classes)
+        #added dropout regularization
         self.dropout = nn.Dropout(0.5)
 
     def _make_layer(self, block, planes, num_blocks, stride):
@@ -140,7 +141,7 @@ model = ResNet(BasicBlock, [2, 2, 2,2]).to(device)
 
 # In[6]:
 
-
+#get the number of parameters, ran into some weird issues with torchsummary crashing the kernel
 model_parameters = filter(lambda p: p.requires_grad, model.parameters())
 params = sum([np.prod(p.size()) for p in model_parameters])
 print(params)
@@ -155,10 +156,10 @@ criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 #optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate,
 #                      momentum=0.9, weight_decay=5e-4)
-#SGD seems much slower than ADAM for this, it might lead to higher accuracy with higher epochs
+#SGD seems much worse than ADAM for this, it might lead to higher accuracy with higher epochs
 #~73% vs 90%
 scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
-
+#didn't get much advantage from changing the scheduler so left with the default from backbone code
 
 # In[8]:
 
